@@ -5,7 +5,6 @@ class Player extends Person {
     }
 
     getArrow(state) {
-        console.log(this.directionInput.direction)
         return this.directionInput.direction
     }
 }

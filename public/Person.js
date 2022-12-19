@@ -23,16 +23,25 @@ class Person extends GameObject {
         return state.arrow;
     }
 
-    updateDirection(state) {
-        const arrow = this.getArrow(state);
+    updateDirection(arrow) {
         if (this.movingProgressRemaining === 0 && arrow) {
             this.direction = arrow;
             this.movingProgressRemaining = 16;
         }
     }
 
+    updateSprite() {
+        if (this.movingProgressRemaining > 0) {
+            this.sprite.setAnimation("walk-" + this.direction);
+        } else {
+            this.sprite.setAnimation("idle-" + this.direction);
+        }
+    }
+
     update(state) {
-        this.updateDirection(state);
+        const arrow = this.getArrow();
+        this.updateDirection(arrow);
+        this.updateSprite();
         this.updatePosition();
     }
 

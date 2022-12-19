@@ -13,7 +13,6 @@ class DirectionInput {
     init() {
         document.addEventListener("keydown", e => {
             const dir = this.map [e.code];
-            console.log(dir);
             if (dir && this.heldDirections.indexOf(dir)) {
                 this.heldDirections.unshift(dir); // add index to array
             }
