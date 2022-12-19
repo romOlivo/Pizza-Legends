@@ -65,7 +65,6 @@ class Sprite {
 
     setAnimation(key) {
         if (this.currentAnimation !== key && Object.keys(this.animations).indexOf(key) != -1) {
-            console.log(key)
             this.currentAnimation = key;
             this.currentAnimationFrame = 0;
             this.animationFrameProgress = this.animationFrameTime;
@@ -82,9 +81,12 @@ class Sprite {
         this.currentAnimationFrame = (this.currentAnimationFrame + 1) % this.animations[this.currentAnimation].length
     }
 
-    draw(ctx) {
-        const x = this.gameObject.x - 8;
-        const y = this.gameObject.y - 18;
+    draw(ctx, cameraPerson) {
+        const xOffset = utils.withGrid(10.5);
+        const yOffset = utils.withGrid(6);
+
+        const x = this.gameObject.x -  8 + xOffset - cameraPerson.x;
+        const y = this.gameObject.y - 18 + yOffset - cameraPerson.y;
 
         const [xFrame, yFrame] = this.frame;
         const frameSize = 32;
