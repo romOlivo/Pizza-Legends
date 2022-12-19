@@ -39,11 +39,8 @@ class Sprite {
     }
 
     draw(ctx) {
-        const squareXSize = 16;
-        const squareYSize = 16;
-
-        const x = this.gameObject.x * squareXSize - 8;
-        const y = this.gameObject.y * squareYSize - 18;
+        const x = this.gameObject.x - 8;
+        const y = this.gameObject.y - 18;
 
         const leftCut = 0;
         const topCut = 0;
