@@ -12,21 +12,22 @@ class Person extends GameObject {
     }
 
     updatePosition() {
-        if (this.movingProgressRemaining > 0) {
-            const [property, change] = this.directionUpdate[this.direction];
-            this[property] += change;
-            this.movingProgressRemaining -= 1;
-        }
+        const [property, change] = this.directionUpdate[this.direction];
+        this[property] += change;
+        this.movingProgressRemaining -= 1;
     }
 
     getArrow(state) {
         return state.arrow;
     }
 
-    updateDirection(arrow) {
-        if (this.movingProgressRemaining === 0 && arrow) {
+    updateDirection(state, arrow, canMove) {
+        if (arrow) {
             this.direction = arrow;
-            this.movingProgressRemaining = 16;
+            if (canMove) {
+                this.movingProgressRemaining = 16;
+                state.map.moveWall(this.x, this.y, this.direction)
+            }
         }
     }
 
@@ -39,10 +40,13 @@ class Person extends GameObject {
     }
 
     update(state) {
-        const arrow = this.getArrow();
-        this.updateDirection(arrow);
+        if (this.movingProgressRemaining > 0) {
+            this.updatePosition();
+        } else {
+            const arrow = this.getArrow(state);
+            this.updateDirection(state, arrow, !state.map.isSpaceTaken(this.x, this.y, arrow));
+        }
         this.updateSprite();
-        this.updatePosition();
     }
 
 }

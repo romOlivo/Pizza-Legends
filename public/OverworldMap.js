@@ -5,6 +5,7 @@ class OverworldMap {
         this.lowerImage.src = config.lowerSrc;
         this.upperImage = new Image();
         this.upperImage.src = config.upperSrc;
+        this.walls = config.walls || {}
     }
 
     drawLowerImage(ctx, cameraPerson) {
@@ -19,6 +20,32 @@ class OverworldMap {
             utils.withGrid(10.5) - cameraPerson.x, 
             utils.withGrid(6) - cameraPerson.y);
     }
+
+    isSpaceTaken(x, y, direction) {
+        const {newX, newY} = utils.nextPosition(x, y, direction);
+        return this.walls[newX + "," + newY] || false;
+    }
+
+    addWall(x, y) {
+        this.walls[x + "," + y] = true;
+    }
+
+    removeWall(x, y) {
+        delete this.walls[x + "," + y];
+    }
+
+    mountGameObjects() {
+        Object.values(this.gameObjects).forEach(obj => {
+            obj.mount(this);
+        });
+    }
+
+    moveWall(x, y, direction) {
+        this.removeWall(x, y);
+        const {newX, newY} = utils.nextPosition(x, y, direction);
+        this.addWall(newX, newY);
+    }
+
 }
 
 window.OverworldMaps = {
@@ -31,7 +58,19 @@ window.OverworldMaps = {
                 y: utils.withGrid(6),
                 useShadow: true,
                 src: "/images/characters/people/hero.png",
-            })
+            }),
+            npc1: new Person({
+                x: utils.withGrid(9),
+                y: utils.withGrid(6),
+                useShadow: true,
+                src: "/images/characters/people/npc1.png",
+            }),
+        },
+        walls: {
+            [utils.asGridCoord(7, 6)]: true,
+            [utils.asGridCoord(8, 6)]: true,
+            [utils.asGridCoord(7, 7)]: true,
+            [utils.asGridCoord(8, 7)]: true,
         }
     },
     Kitchen: {
