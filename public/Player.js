@@ -5,6 +5,10 @@ class Player extends Person {
     }
 
     getArrow(state) {
-        return this.directionInput.direction
+        if (!state.map.isCutscenePlaying) {
+            return this.directionInput.direction
+        } else {
+            return null;
+        }
     }
 }

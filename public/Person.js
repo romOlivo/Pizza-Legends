@@ -15,13 +15,19 @@ class Person extends GameObject {
         const [property, change] = this.directionUpdate[this.direction];
         this[property] += change;
         this.movingProgressRemaining -= 1;
+
+        if (this.movingProgressRemaining === 0) {
+            utils.emitEvent("PersonWalkingComplete", {whoId: this.id});
+        }
+
     }
 
     getArrow(state) {
         return state.arrow;
     }
 
-    updateDirection(state, arrow, canMove) {
+    updateDirection(state, arrow) {
+        const canMove = !state.map.isSpaceTaken(this.x, this.y, arrow)
         if (arrow) {
             this.direction = arrow;
             if (canMove) {
@@ -41,12 +47,32 @@ class Person extends GameObject {
 
     update(state) {
         if (this.movingProgressRemaining > 0) {
+            this.updateSprite();
             this.updatePosition();
         } else {
             const arrow = this.getArrow(state);
-            this.updateDirection(state, arrow, !state.map.isSpaceTaken(this.x, this.y, arrow));
+            this.updateDirection(state, arrow);
+            this.updateSprite();
         }
-        this.updateSprite();
+        
+    }
+
+    startBehavior(state, behavior) {
+        this.direction = behavior.direction;
+
+        if(behavior.type === "walk") {
+            if (state.map.isSpaceTaken(this.x, this.y, this.direction)) {
+                behavior.retry && setTimeout(() => {
+                    this.startBehavior(state, behavior)
+                }, 100)
+            } else {
+                this.updateDirection(state, this.direction)
+            }
+        } else if (behavior.type === "stand") {
+            setTimeout(() => {
+                utils.emitEvent("PersonStandComplete", {whoId: this.id});
+            }, behavior.time)
+        }
     }
 
 }

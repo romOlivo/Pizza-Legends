@@ -6,6 +6,7 @@ class OverworldMap {
         this.upperImage = new Image();
         this.upperImage.src = config.upperSrc;
         this.walls = config.walls || {}
+        this.isCutscenePlaying = false;
     }
 
     drawLowerImage(ctx, cameraPerson) {
@@ -35,7 +36,9 @@ class OverworldMap {
     }
 
     mountGameObjects() {
-        Object.values(this.gameObjects).forEach(obj => {
+        Object.keys(this.gameObjects).forEach(key => {
+            let obj = this.gameObjects[key];
+            obj.id = key;
             obj.mount(this);
         });
     }
@@ -44,6 +47,18 @@ class OverworldMap {
         this.removeWall(x, y);
         const {newX, newY} = utils.nextPosition(x, y, direction);
         this.addWall(newX, newY);
+    }
+
+    async startCutscene(events) {
+        this.isCutscenePlaying = true;
+        for (let i = 0; i < events.length; i++) {
+            const eventHandler = new OverworldEvent({
+                event: events[i],
+                map: this,
+            });
+            await eventHandler.init();
+        }
+        this.isCutscenePlaying = false;
     }
 
 }
@@ -60,10 +75,20 @@ window.OverworldMaps = {
                 src: "/images/characters/people/hero.png",
             }),
             npc1: new Person({
-                x: utils.withGrid(9),
+                x: utils.withGrid(10),
                 y: utils.withGrid(6),
                 useShadow: true,
                 src: "/images/characters/people/npc1.png",
+                behaviorLoop: [
+                    {type: "walk", direction: "left"},
+                    {type: "stand", direction: "left", time: 1600},
+                    {type: "walk", direction: "up"},
+                    {type: "stand", direction: "up", time: 1600},
+                    {type: "walk", direction: "right"},
+                    {type: "stand", direction: "right", time: 1600},
+                    {type: "walk", direction: "down"},
+                    {type: "stand", direction: "down", time: 1600},
+                ]
             }),
         },
         walls: {

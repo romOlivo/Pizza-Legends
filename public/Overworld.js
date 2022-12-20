@@ -10,14 +10,23 @@ class Overworld {
         const step = () => {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
+            // Set camera
             const cameraPerson = this.map.gameObjects.player;
             Object.values(this.map.gameObjects).forEach(obj => {
                 obj.update({ map: this.map });
             })
+
+            // Draw lower map
             this.map.drawLowerImage(this.ctx, cameraPerson);
-            Object.values(this.map.gameObjects).forEach(obj => {
+
+            // Draw the game objects
+            Object.values(this.map.gameObjects).sort((a,b) => {
+                return a.y - b.y;
+            }).forEach(obj => {
                 obj.sprite.draw(this.ctx, cameraPerson);
             })
+
+            // Draw upper map
             this.map.drawUpperImage(this.ctx, cameraPerson);
 
             requestAnimationFrame(() => {
@@ -34,6 +43,12 @@ class Overworld {
         this.directionInput.init();
         this.map.gameObjects.player.directionInput = this.directionInput;
         this.startGameLoop();
+
+        this.map.startCutscene([
+            {who: "player", type: "walk", direction: "down"},
+            {who: "player", type: "walk", direction: "down"},
+            {who: "npc1",   type: "walk", direction: "down"},
+        ])
 
     }
 
