@@ -36,18 +36,48 @@ class Overworld {
         step();
     }
 
-    init() {
-        this.map = new OverworldMap(window.OverworldMaps.DemoRoom);
+    bindActionInput() {
+        new KeyPressListener("Enter", () => {
+            if(!this.map.isCutscenePlaying) {
+                this.map.checkForActionCutscene();
+            }
+        });
+    }
+
+    bindHeroPositionCheck() {
+        document.addEventListener("PersonWalkingComplete", e => {
+            if (e.detail.whoId === "player") {
+                this.map.checkForFootstepCutscene();
+            }
+        })
+    }
+
+    startMap(mapConfig) {
+        this.map = new OverworldMap(mapConfig);
+        this.map.overworld = this;
         this.map.mountGameObjects();
+        
+        this.map.gameObjects.player.directionInput = this.directionInput;
+    }
+
+    init() {
         this.directionInput = new DirectionInput();
         this.directionInput.init();
-        this.map.gameObjects.player.directionInput = this.directionInput;
+
+        this.startMap(window.OverworldMaps.DemoRoom);
+
+        this.bindActionInput();
+        this.bindHeroPositionCheck();
+
+        
         this.startGameLoop();
 
         this.map.startCutscene([
-            {who: "player", type: "walk", direction: "down"},
-            {who: "player", type: "walk", direction: "down"},
-            {who: "npc1",   type: "walk", direction: "down"},
+            {type: "walk", who: "player", direction: "down"},
+            {type: "walk", who: "player", direction: "down"},
+            {type: "walk", who: "npc1",   direction: "down"},
+            {type: "textMessage", text: "Hello!"},
+            {type: "textMessage", text: "Welcome to Pizza Legends!"},
         ])
 
     }

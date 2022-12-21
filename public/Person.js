@@ -16,7 +16,7 @@ class Person extends GameObject {
         this[property] += change;
         this.movingProgressRemaining -= 1;
 
-        if (this.movingProgressRemaining === 0) {
+        if (this.movingProgressRemaining == 0) {
             utils.emitEvent("PersonWalkingComplete", {whoId: this.id});
         }
 
@@ -59,7 +59,7 @@ class Person extends GameObject {
 
     startBehavior(state, behavior) {
         this.direction = behavior.direction;
-
+        this.isStanding = false;
         if(behavior.type === "walk") {
             if (state.map.isSpaceTaken(this.x, this.y, this.direction)) {
                 behavior.retry && setTimeout(() => {
@@ -69,8 +69,10 @@ class Person extends GameObject {
                 this.updateDirection(state, this.direction)
             }
         } else if (behavior.type === "stand") {
+            this.isStanding = true;
             setTimeout(() => {
                 utils.emitEvent("PersonStandComplete", {whoId: this.id});
+                this.isStanding = false;
             }, behavior.time)
         }
     }

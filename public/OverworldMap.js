@@ -1,5 +1,6 @@
 class OverworldMap {
     constructor(config) {
+        this.overworld = null;
         this.gameObjects = config.gameObjects;
         this.lowerImage = new Image();
         this.lowerImage.src = config.lowerSrc;
@@ -7,6 +8,7 @@ class OverworldMap {
         this.upperImage.src = config.upperSrc;
         this.walls = config.walls || {}
         this.isCutscenePlaying = false;
+        this.cutscenesSpaces = config.cutscenesSpaces || {};
     }
 
     drawLowerImage(ctx, cameraPerson) {
@@ -59,6 +61,28 @@ class OverworldMap {
             await eventHandler.init();
         }
         this.isCutscenePlaying = false;
+
+        // Set normal behavior to NPCs
+        Object.values(this.gameObjects).forEach(obj => obj.doBehaviorEvent(this));
+    }
+
+    checkForActionCutscene() {
+        const player = this.gameObjects["player"];
+        const {newX, newY} = utils.nextPosition(player.x, player.y, player.direction);
+        const match = Object.values(this.gameObjects).find(obj => {
+            return obj.x == newX && obj.y == newY;
+        });
+        if (match && match.talking.length) {
+            this.startCutscene(match.talking[0].events)
+        }
+    }
+
+    checkForFootstepCutscene() {
+        const player = this.gameObjects["player"];
+        const match = this.cutscenesSpaces[player.x + "," + player.y]
+        if (!this.isCutscenePlaying && match) {
+            this.startCutscene(match[0].events);
+        }
     }
 
 }
@@ -88,6 +112,14 @@ window.OverworldMaps = {
                     {type: "stand", direction: "right", time: 1600},
                     {type: "walk", direction: "down"},
                     {type: "stand", direction: "down", time: 1600},
+                ],
+                talking: [
+                    {
+                        events: [
+                            {type: "textMessage", text: "Hello player", faceHero: "npc1"},
+                            {type: "textMessage", text: "Nice to meet you!"},
+                        ]
+                    }
                 ]
             }),
         },
@@ -96,6 +128,24 @@ window.OverworldMaps = {
             [utils.asGridCoord(8, 6)]: true,
             [utils.asGridCoord(7, 7)]: true,
             [utils.asGridCoord(8, 7)]: true,
+        },
+        cutscenesSpaces: {
+            [utils.asGridCoord(7, 4)]: [
+                {
+                    events: [
+                        { type: "walk", who: "player", direction: "down"},
+                        { type: "textMessage", text: "You can't be in there!"},
+                    ]
+                }
+            ],
+            [utils.asGridCoord(5, 10)]: [
+                {
+                    events: [
+                        { type: "changeMap", map: "Kitchen"},
+                    ]
+                }
+            ],
+
         }
     },
     Kitchen: {
