@@ -78,6 +78,7 @@ class Overworld {
             {type: "walk", who: "npc1",   direction: "down"},
             {type: "textMessage", text: "Hello!"},
             {type: "textMessage", text: "Welcome to Pizza Legends!"},
+            {type: "battle"},
         ])
 
     }

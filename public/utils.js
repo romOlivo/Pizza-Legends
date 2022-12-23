@@ -29,6 +29,9 @@ const utils = {
         if (direction === "down") { return "up"; }
         if (direction === "left") { return "right"; }
         if (direction === "right") { return "left"; }
+    },
+    getGameContainer() {
+        return document.querySelector(".game-container");
     }
 
 
