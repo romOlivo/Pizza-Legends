@@ -6,9 +6,13 @@ class TextMessage {
     }
 
     done() {
-        this.actionListener.unbind();
-        this.element.remove();
-        this.onComplete();
+        if (this.revealingText.isDone) {
+            this.actionListener.unbind();
+            this.element.remove();
+            this.onComplete();
+        } else {
+            this.revealingText.warpToDone();
+        }
     }
 
     crearteElement() {
@@ -16,9 +20,14 @@ class TextMessage {
         this.element.classList.add("TextMessage");
 
         this.element.innerHTML = (
-            '<p class="TextMessageP">' + this.text + '</p>' +
+            '<p class="TextMessageP"> </p>' +
             '<button class="TextMessageButton">Next</button>'
         );
+
+        this.revealingText = new RevealingText({
+            element: this.element.querySelector(".TextMessageP"),
+            text: this.text,
+        })
 
         this.element.querySelector("button").addEventListener("click", () => {
             this.done();
@@ -33,6 +42,7 @@ class TextMessage {
     init(container) {
         this.crearteElement();
         container.appendChild(this.element);
+        this.revealingText.init();
     }
 
 }
